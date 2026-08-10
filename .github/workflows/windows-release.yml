@@ -1,0 +1,49 @@
+name: Windows build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install frontend deps
+        run: pnpm install
+
+      - name: Build Tauri (CPU)
+        run: pnpm tauri:build:cpu
+        env:
+          # Disable Windows codesign in CI (upstream script requires secrets)
+          TAURI_SIGNING_PRIVATE_KEY: ''
+          NEXT_PUBLIC_MIA_API_URL: https://www.m-ia.app
+          NEXT_PUBLIC_MIA_SUPABASE_URL: https://idlhouaracvkzqtklzbp.supabase.co
+          NEXT_PUBLIC_MIA_SUPABASE_ANON_KEY: ${{ secrets.MIA_SUPABASE_ANON_KEY }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mia-meeting-windows
+          path: |
+            frontend/src-tauri/target/release/bundle/nsis/*.exe
+            frontend/src-tauri/target/release/bundle/msi/*.msi

@@ -8,6 +8,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { toast } from 'sonner';
 import { TranscriptPanel } from '@/components/MeetingDetails/TranscriptPanel';
 import { SummaryPanel } from '@/components/MeetingDetails/SummaryPanel';
+import { MiaSyncPanel } from '@/components/MiaSyncPanel';
 import { ModelConfig } from '@/components/ModelSettingsModal';
 
 // Custom hooks
@@ -163,6 +164,11 @@ export default function PageContent({
     };
   }, [shouldAutoGenerate, meeting.id]); // Re-run if meeting changes
 
+  const transcriptTextForMia = (meetingData.transcripts || [])
+    .map((t: any) => t.text || t.content || '')
+    .filter(Boolean)
+    .join('\n');
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -170,6 +176,10 @@ export default function PageContent({
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className="flex flex-col h-screen bg-gray-50"
     >
+      <MiaSyncPanel
+        meetingTitle={meetingData.meetingTitle || meeting.title || 'Réunion'}
+        transcriptText={transcriptTextForMia}
+      />
       <div className="flex flex-1 overflow-hidden">
         <TranscriptPanel
           transcripts={meetingData.transcripts}

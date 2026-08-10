@@ -1,5 +1,5 @@
 {
-    "name": "meetily",
+    "name": "mia-meeting",
     "version": "0.4.0",
     "private": true,
     "main": "electron/main.js",
@@ -55,6 +55,7 @@
         "@remirror/extension-underline": "^3.0.1",
         "@remirror/pm": "^3.0.0",
         "@remirror/react": "^3.0.1",
+        "@supabase/supabase-js": "^2.112.2",
         "@tanstack/react-virtual": "^3.13.13",
         "@tauri-apps/api": "^2.6.0",
         "@tauri-apps/plugin-fs": "^2.4.0",
