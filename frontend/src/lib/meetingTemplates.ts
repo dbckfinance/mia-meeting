@@ -1,4 +1,4 @@
-/** Templates de résumé M&A pour sync M&IA */
+/** Templates de résumé M&A pour sync Reikn */
 
 export const MEETING_TEMPLATES = [
   {

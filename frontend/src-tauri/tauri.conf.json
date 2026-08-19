@@ -1,6 +1,6 @@
 {
     "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-    "productName": "M&IA Meeting",
+    "productName": "Reikn",
     "version": "0.4.0",
     "identifier": "io.m-ia.meeting",
     "build": {
@@ -12,7 +12,7 @@
     "app": {
         "windows": [
             {
-                "title": "M&IA Meeting",
+                "title": "Reikn",
                 "width": 1100,
                 "height": 700,
                 "resizable": true,

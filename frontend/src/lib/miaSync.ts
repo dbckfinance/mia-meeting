@@ -1,10 +1,11 @@
 /**
- * Sync local meeting transcript → M&IA cloud APIs.
+ * Sync local meeting transcript → Reikn cloud APIs.
  */
 
 import { MIA_API_URL } from './miaConfig';
 import { getMiaAccessToken } from './miaAuth';
 import type { MeetingTemplateId } from './meetingTemplates';
+import { getAutoSyncEnabled, getCloudMeetingId, setCloudMeetingId } from './miaSyncPrefs';
 
 export type MiaMeetingSession = {
   id: string;
@@ -16,7 +17,7 @@ export type MiaMeetingSession = {
 
 async function authHeaders(): Promise<HeadersInit> {
   const token = await getMiaAccessToken();
-  if (!token) throw new Error('Connectez-vous à M&IA dans Paramètres → Compte M&IA');
+  if (!token) throw new Error('Connectez-vous à Reikn dans Paramètres → Compte Reikn');
   return {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -31,7 +32,7 @@ async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(body.error || `M&IA API ${res.status}`);
+    throw new Error(body.error || `Reikn API ${res.status}`);
   }
   return body as T;
 }
@@ -43,10 +44,12 @@ export type SyncMeetingInput = {
   summaryTemplate?: MeetingTemplateId;
   /** When false, only creates the cloud session without summarize */
   summarize?: boolean;
+  /** Local SQLite meeting id — used to avoid duplicate cloud POSTs */
+  localMeetingId?: string;
 };
 
 /**
- * Push a finished local transcript to M&IA and optionally run M&A summarize.
+ * Push a finished local transcript to Reikn and optionally run M&A summarize.
  */
 export async function syncMeetingToMia(input: SyncMeetingInput): Promise<{
   meeting: MiaMeetingSession;
@@ -83,6 +86,42 @@ export async function syncMeetingToMia(input: SyncMeetingInput): Promise<{
     meeting = summarized.meeting;
   }
 
+  if (input.localMeetingId) {
+    await setCloudMeetingId(input.localMeetingId, meeting.id);
+  }
+  return { meeting };
+}
+
+export type AutoSyncMeetingInput = {
+  localMeetingId: string;
+  title: string;
+  transcriptText: string;
+  meetingType?: MeetingTemplateId;
+};
+
+/**
+ * Fire-and-forget cloud push after a local save. No-ops if logged out,
+ * auto-sync is off, the transcript is too short, or this meeting was already sent.
+ */
+export async function autoSyncMeetingAfterSave(input: AutoSyncMeetingInput): Promise<{
+  skipped?: string;
+  meeting?: MiaMeetingSession;
+}> {
+  const enabled = await getAutoSyncEnabled();
+  if (!enabled) return { skipped: 'disabled' };
+  if ((input.transcriptText || '').trim().length < 20) return { skipped: 'too_short' };
+  const token = await getMiaAccessToken();
+  if (!token) return { skipped: 'logged_out' };
+  const existing = await getCloudMeetingId(input.localMeetingId);
+  if (existing) return { skipped: 'already_synced', meeting: { id: existing } };
+  const { meeting } = await syncMeetingToMia({
+    title: input.title,
+    transcriptText: input.transcriptText,
+    meetingType: input.meetingType,
+    summaryTemplate: input.meetingType,
+    summarize: true,
+    localMeetingId: input.localMeetingId,
+  });
   return { meeting };
 }
 

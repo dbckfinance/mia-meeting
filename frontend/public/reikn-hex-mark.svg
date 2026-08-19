@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Reikn">
+  <rect width="64" height="64" fill="#000"/>
+  <path
+    d="M32 6 L50.5 16.5 L50.5 37.5 L32 48 L13.5 37.5 L13.5 16.5 Z"
+    stroke="#fff"
+    stroke-width="5"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+  <path d="M23 36 L30 21" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M30.5 38 L37.5 23" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M38 40 L45 25" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="45.5" cy="43.5" r="2.5" fill="#C8E063"/>
+</svg>

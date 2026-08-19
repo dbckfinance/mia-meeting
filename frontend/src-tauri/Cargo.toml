@@ -1,8 +1,8 @@
 [package]
 name = "mia-meeting"
 version = "0.4.0"
-description = "M&IA Meeting — local AI meeting assistant (fork of Meetily)"
-authors = ["M&IA", "Meetily / Zackriya Solutions contributors"]
+description = "Reikn — local AI meeting assistant"
+authors = ["Reikn"]
 license = "MIT"
 repository = "https://github.com/dbckfinance/mia-meeting"
 edition = "2021"

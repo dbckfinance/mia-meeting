@@ -9,6 +9,7 @@ import {
   subscribeMiaAuth,
 } from '@/lib/miaAuth';
 import { MIA_API_URL, MIA_SUPABASE_ANON_KEY } from '@/lib/miaConfig';
+import { getAutoSyncEnabled, setAutoSyncEnabled } from '@/lib/miaSyncPrefs';
 import type { User } from '@supabase/supabase-js';
 
 export function MiaAccountSettings() {
@@ -18,6 +19,7 @@ export function MiaAccountSettings() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [autoSync, setAutoSync] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -25,7 +27,11 @@ export function MiaAccountSettings() {
       try {
         await restoreMiaSession();
         const u = await getMiaUser();
-        if (!cancelled) setUser(u);
+        const syncOn = await getAutoSyncEnabled();
+        if (!cancelled) {
+          setUser(u);
+          setAutoSync(syncOn);
+        }
       } catch {
         if (!cancelled) setUser(null);
       } finally {
@@ -70,16 +76,16 @@ export function MiaAccountSettings() {
   };
 
   if (loading) {
-    return <p className="text-sm text-gray-500">Chargement du compte M&IA…</p>;
+    return <p className="text-sm text-gray-500">Chargement du compte Reikn…</p>;
   }
 
   return (
     <div className="space-y-6 max-w-xl">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">Compte M&IA</h2>
+        <h2 className="text-xl font-semibold text-gray-900">Compte Reikn</h2>
         <p className="text-sm text-gray-500 mt-1">
-          Connectez-vous pour envoyer les transcripts vers {MIA_API_URL} (résumés M&A + Supercomputer).
-          La transcription reste locale tant que vous ne synchronisez pas.
+          Connectez-vous pour envoyer les transcripts vers {MIA_API_URL} (résumés M&A, Assistant, Supercomputer).
+          La transcription reste locale ; l’auto-sync ne part que si vous êtes connecté.
         </p>
       </div>
 
@@ -95,6 +101,25 @@ export function MiaAccountSettings() {
           <p className="text-sm text-gray-700">
             Connecté : <span className="font-medium">{user.email}</span>
           </p>
+          <label className="flex items-start gap-2 text-sm text-gray-700 cursor-pointer">
+            <input
+              type="checkbox"
+              className="mt-0.5"
+              checked={autoSync}
+              onChange={async (e) => {
+                const next = e.target.checked;
+                setAutoSync(next);
+                await setAutoSyncEnabled(next);
+              }}
+            />
+            <span>
+              <span className="font-medium">Auto-sync vers Reikn</span>
+              <span className="block text-xs text-gray-500 mt-0.5">
+                Après chaque enregistrement, le transcript est envoyé à l’Assistant (onglet Transcripts + Knowledge Base).
+                Décochez pour rester 100 % local.
+              </span>
+            </span>
+          </label>
           <button
             type="button"
             onClick={onLogout}
@@ -134,7 +159,7 @@ export function MiaAccountSettings() {
             disabled={busy}
             className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium disabled:opacity-50"
           >
-            {busy ? 'Connexion…' : 'Se connecter à M&IA'}
+            {busy ? 'Connexion…' : 'Se connecter à Reikn'}
           </button>
         </form>
       )}

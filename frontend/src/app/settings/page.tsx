@@ -16,7 +16,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 // Tabs configuration (constant)
 const TABS = [
-  { value: 'mia', label: 'Compte M&IA', icon: Cloud },
+  { value: 'mia', label: 'Compte Reikn', icon: Cloud },
   { value: 'general', label: 'General', icon: Settings2 },
   { value: 'recording', label: 'Recordings', icon: Mic },
   { value: 'Transcriptionmodels', label: 'Transcription', icon: DatabaseIcon },

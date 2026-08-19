@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { VisuallyHidden } from "./ui/visually-hidden";
 import { About } from "./About";
@@ -8,25 +7,38 @@ interface LogoProps {
     isCollapsed: boolean;
 }
 
+const HexMark = ({ size }: { size: number }) => (
+  <img
+    src="/reikn-hex.png"
+    alt="Reikn"
+    width={size}
+    height={size}
+    className="block rounded-[4px]"
+    draggable={false}
+    style={{ imageRendering: "auto" }}
+  />
+);
+
 const Logo = React.forwardRef<HTMLButtonElement, LogoProps>(({ isCollapsed }, ref) => {
   return (
     <Dialog aria-describedby={undefined}>
       {isCollapsed ? (
         <DialogTrigger asChild>
           <button ref={ref} className="flex items-center justify-start mb-2 cursor-pointer bg-transparent border-none p-0 hover:opacity-80 transition-opacity">
-            <Image src="/logo-collapsed.png" alt="Logo" width={40} height={32} />
+            <HexMark size={40} />
           </button>
         </DialogTrigger>
       ) : (
         <DialogTrigger asChild>
-          <span className="text-lg text-center border rounded-full bg-blue-50 border-white font-semibold text-gray-700 mb-2 block items-center cursor-pointer hover:opacity-80 transition-opacity">
-            <span>M&IA Meeting</span>
-          </span>
+          <button ref={ref} className="flex items-center gap-2 mb-2 cursor-pointer bg-transparent border-none p-0 hover:opacity-80 transition-opacity">
+            <HexMark size={28} />
+            <span className="text-lg font-semibold tracking-tight text-gray-900">Reikn</span>
+          </button>
         </DialogTrigger>
       )}
       <DialogContent>
         <VisuallyHidden>
-          <DialogTitle>About M&IA Meeting</DialogTitle>
+          <DialogTitle>About Reikn</DialogTitle>
         </VisuallyHidden>
         <About />
       </DialogContent>

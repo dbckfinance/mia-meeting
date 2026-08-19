@@ -335,6 +335,28 @@ export function useRecordingStop(
             duration: 10000,
           });
 
+          const transcriptText = freshTranscripts
+            .map((t) => t.text || '')
+            .filter(Boolean)
+            .join('\n');
+          void import('@/lib/miaSync')
+            .then(({ autoSyncMeetingAfterSave }) =>
+              autoSyncMeetingAfterSave({
+                localMeetingId: meetingId,
+                title: savedMeetingName || meetingTitle || 'New Meeting',
+                transcriptText,
+              })
+            )
+            .then((result) => {
+              if (result?.meeting && !result.skipped) {
+                toast.success('Transcript envoyé à Reikn');
+              }
+            })
+            .catch((err) => {
+              console.warn('[auto-sync Reikn]', err);
+              toast.error(err instanceof Error ? err.message : 'Échec sync Reikn');
+            });
+
           // Auto-navigate after a short delay with source parameter
           setTimeout(() => {
             router.push(`/meeting-details?id=${meetingId}&source=recording`);

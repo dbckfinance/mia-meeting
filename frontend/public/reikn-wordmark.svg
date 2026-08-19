@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 96" fill="none" role="img" aria-label="Reikn">
+  <rect width="320" height="96" fill="#000"/>
+  <text
+    x="160"
+    y="62"
+    text-anchor="middle"
+    font-family="Space Grotesk, Arial Black, Arial, sans-serif"
+    font-size="56"
+    font-weight="600"
+    letter-spacing="-0.04em"
+    fill="#fff"
+  >Reikn</text>
+  <!-- Lime tittle over the i -->
+  <rect x="149" y="22" width="9" height="9" rx="1.5" transform="rotate(18 153.5 26.5)" fill="#C8E063"/>
+</svg>

@@ -1,36 +1,59 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Cloud, Cpu, Loader2, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { MEETING_TEMPLATES, type MeetingTemplateId } from '@/lib/meetingTemplates';
 import { launchMiaSupercomputer, syncMeetingToMia } from '@/lib/miaSync';
 import { getMiaAccessToken } from '@/lib/miaAuth';
+import { getAutoSyncEnabled, getCloudMeetingId, setAutoSyncEnabled } from '@/lib/miaSyncPrefs';
 
 type Props = {
   meetingTitle: string;
   /** Plain transcript text (joined segments) */
   transcriptText: string;
+  localMeetingId?: string;
 };
 
-export function MiaSyncPanel({ meetingTitle, transcriptText }: Props) {
+export function MiaSyncPanel({ meetingTitle, transcriptText, localMeetingId }: Props) {
   const [template, setTemplate] = useState<MeetingTemplateId>('ic_prep');
   const [stayLocal, setStayLocal] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [launching, setLaunching] = useState(false);
-  const [cloudMeetingId, setCloudMeetingId] = useState<string | null>(null);
+  const [cloudMeetingId, setCloudMeetingIdState] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [enabled, existing] = await Promise.all([
+        getAutoSyncEnabled(),
+        localMeetingId ? getCloudMeetingId(localMeetingId) : Promise.resolve(null),
+      ]);
+      if (cancelled) return;
+      setStayLocal(!enabled);
+      if (existing) setCloudMeetingIdState(existing);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [localMeetingId]);
 
   const canSync = useMemo(
     () => (transcriptText || '').trim().length >= 20 && !stayLocal,
     [transcriptText, stayLocal]
   );
 
+  const handleStayLocal = async (checked: boolean) => {
+    setStayLocal(checked);
+    await setAutoSyncEnabled(!checked);
+  };
+
   const handleSync = async () => {
     setSyncing(true);
     try {
       const token = await getMiaAccessToken();
       if (!token) {
-        toast.error('Connectez-vous dans Paramètres → Compte M&IA');
+        toast.error('Connectez-vous dans Paramètres → Compte Reikn');
         return;
       }
       const { meeting } = await syncMeetingToMia({
@@ -39,11 +62,12 @@ export function MiaSyncPanel({ meetingTitle, transcriptText }: Props) {
         meetingType: template,
         summaryTemplate: template,
         summarize: true,
+        localMeetingId,
       });
-      setCloudMeetingId(meeting.id);
-      toast.success('Réunion synchronisée avec M&IA');
+      setCloudMeetingIdState(meeting.id);
+      toast.success('Réunion synchronisée avec Reikn');
     } catch (err: any) {
-      toast.error(err?.message || 'Échec sync M&IA');
+      toast.error(err?.message || 'Échec sync Reikn');
     } finally {
       setSyncing(false);
     }
@@ -60,9 +84,10 @@ export function MiaSyncPanel({ meetingTitle, transcriptText }: Props) {
           meetingType: template,
           summaryTemplate: template,
           summarize: true,
+          localMeetingId,
         });
         id = meeting.id;
-        setCloudMeetingId(id);
+        setCloudMeetingIdState(id);
       }
       await launchMiaSupercomputer(id);
       toast.success('Mission Supercomputer lancée');
@@ -77,16 +102,18 @@ export function MiaSyncPanel({ meetingTitle, transcriptText }: Props) {
     <div className="mx-4 mb-3 rounded-xl border border-teal-200 bg-gradient-to-r from-teal-50 to-emerald-50 px-4 py-3">
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-teal-900">M&IA cloud</p>
+          <p className="text-sm font-semibold text-teal-900">Reikn cloud</p>
           <p className="text-xs text-teal-800/70 mt-0.5">
-            Transcription locale · sync optionnelle vers résumé M&A / Supercomputer
+            {cloudMeetingId
+              ? 'Synchronisé avec Reikn — résumé M&A et Supercomputer disponibles'
+              : 'Transcription locale · sync automatique vers Reikn si vous êtes connecté'}
           </p>
         </div>
         <label className="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
           <input
             type="checkbox"
             checked={stayLocal}
-            onChange={(e) => setStayLocal(e.target.checked)}
+            onChange={(e) => void handleStayLocal(e.target.checked)}
           />
           <Shield className="w-3.5 h-3.5" />
           Rester 100 % local
@@ -109,12 +136,12 @@ export function MiaSyncPanel({ meetingTitle, transcriptText }: Props) {
 
         <button
           type="button"
-          disabled={!canSync || syncing}
+          disabled={!canSync || syncing || Boolean(cloudMeetingId)}
           onClick={handleSync}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-700 disabled:opacity-40"
         >
           {syncing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Cloud className="w-3.5 h-3.5" />}
-          Envoyer à M&IA
+          {cloudMeetingId ? 'Envoyé à Reikn' : 'Envoyer à Reikn'}
         </button>
 
         <button
