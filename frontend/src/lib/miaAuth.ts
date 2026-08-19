@@ -1,5 +1,5 @@
 /**
- * Supabase auth for M&IA Meeting (Tauri).
+ * Supabase auth for Reikn (Tauri).
  * Session persisted via @tauri-apps/plugin-store when available, else localStorage.
  */
 

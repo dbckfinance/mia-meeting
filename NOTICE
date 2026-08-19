@@ -1,19 +1,19 @@
-M&IA Meeting
-Copyright (c) M&IA / dbckfinance
+Reikn
+Copyright (c) Reikn / dbckfinance
 
-This product is derived from Meetily (meeting-minutes), originally developed by
-Zackriya Solutions and contributors.
+This product includes software originally developed as Meetily
+(meeting-minutes) by Zackriya Solutions and contributors, licensed under MIT.
 
 Upstream project: https://github.com/Zackriya-Solutions/meetily
 License: MIT (see LICENSE.md)
 
-Acknowledgments from upstream Meetily (retained):
+Acknowledgments from upstream (retained):
 - Whisper.cpp (ggerganov)
 - Screenpipe (mediar-ai)
 - transcribe-rs
 - NVIDIA Parakeet model
 - istupakov ONNX conversion of Parakeet
 
-M&IA Meeting adds Supabase authentication and synchronization with the M&IA
-cloud APIs (https://www.m-ia.app). Local transcription remains powered by the
-upstream Meetily Rust/Tauri stack.
+Reikn adds Supabase authentication and optional synchronization with
+the Reikn cloud APIs (https://reikn.com). Local transcription remains
+on-device.

@@ -1,34 +1,44 @@
-# M&IA Meeting
+# Reikn
 
 Privacy-first **local** AI meeting assistant for M&A workflows.  
-Fork of [Meetily](https://github.com/Zackriya-Solutions/meetily) (MIT) — rebranded and connected to [M&IA](https://www.m-ia.app).
+Connected to [Reikn](https://reikn.com) for optional cloud sync.
 
 ## What it does
 
 - Captures mic + system audio and transcribes **locally** (Whisper / Parakeet)
-- Optional sync to M&IA cloud: structured M&A summary + Supercomputer handoff
-- Toggle: stay 100% local, or send transcript to your M&IA account
+- Optional sync to Reikn cloud: structured M&A summary + Supercomputer handoff
+- Toggle: stay 100% local, or send transcript to your Reikn account
 
-## Relationship to M&IA Desktop (Electron)
+## Relationship to Reikn Desktop (Electron)
 
 | App | Role |
 |-----|------|
-| **M&IA Meeting** (this repo, Tauri) | Local-first capture + STT |
-| **M&IA Desktop** ([m-ia](https://github.com/dbckfinance/m-ia)) | Assistant, Supercomputer, Deals, cloud Meetings |
+| **Reikn** (this repo, Tauri) | Local-first capture + STT |
+| **Reikn Desktop** ([m-ia](https://github.com/dbckfinance/m-ia)) | Assistant, Supercomputer, Deals, cloud Meetings |
 
 ## Prerequisites
 
 - Rust (stable), Node.js 20+, pnpm
 - Windows: Visual Studio Build Tools + (optional) CUDA/Vulkan for GPU
-- See upstream [BUILDING.md](docs/BUILDING.md)
+- See [BUILDING.md](docs/BUILDING.md)
 
 ## Quick start (dev)
 
 ```bash
+# Install pnpm once (Windows) if missing:
+npm install -g pnpm@9
+
 cd frontend
 pnpm install
-cp .env.example .env.local   # Supabase anon + M&IA API URL
+cp .env.example .env.local   # fill NEXT_PUBLIC_MIA_SUPABASE_ANON_KEY
 pnpm tauri:dev               # or pnpm tauri:dev:cuda on NVIDIA
+```
+
+If PowerShell says `pnpm` is not recognized, close and reopen the terminal (PATH), or call:
+
+```powershell
+$env:Path += ";$env:APPDATA\npm"
+pnpm tauri:dev
 ```
 
 ## Environment

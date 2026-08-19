@@ -179,6 +179,7 @@ export default function PageContent({
       <MiaSyncPanel
         meetingTitle={meetingData.meetingTitle || meeting.title || 'Réunion'}
         transcriptText={transcriptTextForMia}
+        localMeetingId={meeting.id}
       />
       <div className="flex flex-1 overflow-hidden">
         <TranscriptPanel
