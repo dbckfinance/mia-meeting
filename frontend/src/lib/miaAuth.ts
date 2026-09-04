@@ -14,7 +14,7 @@ let client: SupabaseClient | null = null;
 async function loadStoredSession(): Promise<Session | null> {
   try {
     const { load } = await import('@tauri-apps/plugin-store');
-    const store = await load('mia-auth.json', { autoSave: true });
+    const store = await load('mia-auth.json', { defaults: {}, autoSave: true });
     const raw = await store.get<string>(STORE_KEY);
     if (raw) return JSON.parse(raw) as Session;
   } catch {
@@ -33,7 +33,7 @@ async function persistSession(session: Session | null) {
   const payload = session ? JSON.stringify(session) : null;
   try {
     const { load } = await import('@tauri-apps/plugin-store');
-    const store = await load('mia-auth.json', { autoSave: true });
+    const store = await load('mia-auth.json', { defaults: {}, autoSave: true });
     if (payload) await store.set(STORE_KEY, payload);
     else await store.delete(STORE_KEY);
     await store.save();

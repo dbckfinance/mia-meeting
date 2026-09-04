@@ -15,7 +15,7 @@ async function withStore<T>(fn: (store: {
 }) => Promise<T>): Promise<T | null> {
   try {
     const { load } = await import('@tauri-apps/plugin-store');
-    const store = await load(STORE_FILE, { autoSave: true });
+    const store = await load(STORE_FILE, { defaults: {}, autoSave: true });
     return await fn(store);
   } catch {
     return null;
