@@ -31,6 +31,17 @@ jobs:
       - name: Install frontend deps
         run: pnpm install
 
+      - name: Build llama-helper sidecar
+        working-directory: .
+        shell: pwsh
+        run: |
+          Write-Host "Building llama-helper sidecar (CPU-only)..."
+          cargo build --release -p llama-helper
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          New-Item -ItemType Directory -Force -Path "frontend/src-tauri/binaries" | Out-Null
+          Copy-Item "target/release/llama-helper.exe" -Destination "frontend/src-tauri/binaries/llama-helper-x86_64-pc-windows-msvc.exe"
+          Get-ChildItem "frontend/src-tauri/binaries/"
+
       - name: Build Tauri (CPU)
         run: pnpm tauri:build:cpu
         env:
